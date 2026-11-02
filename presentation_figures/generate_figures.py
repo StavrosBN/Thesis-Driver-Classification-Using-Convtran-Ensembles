@@ -66,7 +66,7 @@ def fig_class_distribution():
 def fig_mutual_information():
     from sklearn.feature_selection import mutual_info_classif
     df = pd.read_csv("data/drivers_data.csv")
-    # διορθώνουμε διπλά ονόματα στηλών όπως στο notebook
+    # corrected names from double columns 
     cols = pd.Series(df.columns)
     for dupe in cols[cols.duplicated()].unique():
         cols[cols == dupe] = [f"{dupe}_{i}" if i != 0 else dupe for i in range(sum(cols == dupe))]
@@ -107,7 +107,7 @@ def fig_iqr_clipping():
 def fig_split_and_windowing():
     fig, (ax1, ax2) = plt.subplots(2, 1, figsize=(11, 5.5), gridspec_kw={"height_ratios": [1, 1.3]})
 
-    # --- πάνω: χρονολογικός χωρισμός μιας διαδρομής (block)
+    
     parts = [("ConvTran train\n70%", 0.70, "#4C78A8"),
              ("Val\n10%", 0.10, "#F2B134"),
              ("Meta-train\n10%", 0.10, "#54A24B"),
@@ -127,7 +127,7 @@ def fig_split_and_windowing():
     ax1.axis("off")
     ax1.set_title("Χρονολογικός χωρισμός ανά διαδρομή (χωρίς ανακάτεμα)", fontsize=13)
 
-    # --- κάτω: sliding windows
+    
     L, S, n = 60, 15, 180
     ax2.add_patch(Rectangle((0, 0), n, 1, fc="#EEEEEE", ec="#555555"))
     cols = ["#4C78A8", "#F58518", "#54A24B", "#D1495B"]
@@ -218,7 +218,7 @@ def fig_convtran_architecture():
     save(fig, "fig06_convtran_architecture.png")
 
 
-# ---------------------------------------------------------------- αξιολόγηση
+# ---------------------------------------------------------------- validation
 def compute_predictions():
     """Υπολογίζει προβλέψεις και των 4 προσεγγίσεων από τα αποθηκευμένα μοντέλα."""
     import torch
@@ -260,7 +260,7 @@ def compute_predictions():
     f1s = {k: f1_score(y, p, average=None, labels=range(10), zero_division=0) for k, p in preds.items()}
     macro = {k: f1_score(y, p, average="macro", zero_division=0) for k, p in preds.items()}
 
-    # 3 επιμέρους ConvTran στα δικά τους test sets
+    # 3 ConvTran on their test sets
     sub = {}
     for i, g in enumerate(["cleaned_1", "cleaned_2", "cleaned_3"], start=1):
         mm = load_convtran(f"outputs/models/convtran_{g}.pt")
@@ -326,7 +326,7 @@ DRV = list("ABCDEFGHIJ")
 C_RF, C_SINGLE, C_ENS = "#F58518", "#54A24B", "#4C78A8"
 G1, G2, G3 = "#4C78A8", "#F58518", "#54A24B"
  
-# ---- Αριθμοί από τη διπλωματική -------------------------------------------
+# ---- Numbers from thesis -------------------------------------------
 ACC = {"RF baseline": 55.30, "Single ConvTran": 53.95, "Ensemble": 67.24}   # Πίνακας 7.2
 SUB = {"f1 (A,B,C)": 96.62, "f2 (D,E,F)": 50.76, "f3 (G,H,I,J)": 73.22}   # Πίνακας 7.2
  
@@ -443,18 +443,3 @@ if __name__ == "__main__":
 
 
 
-'''if __name__ == "__main__":
-    fig_class_distribution()
-    fig_mutual_information()
-    fig_iqr_clipping()
-    fig_split_and_windowing()
-    fig_pipeline()
-    fig_convtran_architecture()
-
-    accs, f1s, macro, sub = compute_predictions()
-    print("\nAccuracy:", {k: round(v, 4) for k, v in accs.items()})
-    print("Sub-models:", {k: round(v, 4) for k, v in sub.items()})
-    fig_accuracy_comparison(accs, macro, sub)
-    fig_perclass_f1(f1s)
-    print("\nΤέλος. Οι εικόνες είναι στον φάκελο:", OUT)
-    '''

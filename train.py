@@ -16,12 +16,12 @@ torch.manual_seed(SEED)
 if torch.cuda.is_available():
     torch.cuda.manual_seed_all(SEED)
 
-# ---------- Ρυθμίσεις ----------
+
 DEVICE = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 EPOCHS = 100
 BATCH_SIZE = 16
 LEARNING_RATE = 1e-3
-PATIENCE = 25          # early stopping: σταματάει αν δεν βελτιωθεί το val loss για τόσα epochs
+PATIENCE = 25          # early stopping
 EMB_SIZE = 16
 NUM_HEADS = 8
 DIM_FF = 256
@@ -57,7 +57,7 @@ class WindowDataset(Dataset):
         return self.X[idx], self.y[idx]
 
 
-# ---------- Εκπαίδευση ενός ConvTran ----------
+# ---------- Training one ConvTran ----------
 def train_one_group(group_name, num_classes, data_dir):
     print(f'\n=== Εκπαίδευση ConvTran για {group_name} ===')
 
@@ -148,7 +148,7 @@ def train_one_group(group_name, num_classes, data_dir):
     print(f'Αποθηκεύτηκε: {save_path} (val_loss={best_state["val_loss"]:.4f}, val_acc={best_state["val_acc"]:.4f})')
 
 
-# ---------- Εκπαίδευση και των 3 ομάδων ----------
+# ---------- Training all 3 teams ----------
 if __name__ == '__main__':
     print(f'Χρήση συσκευής: {DEVICE}')
     for group_name, cfg in GROUPS.items():

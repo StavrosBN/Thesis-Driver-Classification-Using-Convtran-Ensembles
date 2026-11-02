@@ -11,7 +11,7 @@ OUTPUT_MODELS_DIR = 'outputs/models'
 OUTPUT_PLOTS_DIR = 'outputs/plots'
 os.makedirs(OUTPUT_PLOTS_DIR, exist_ok=True)
 
-CLASS_NAMES = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J']  # σειρά = 0..9, όπως το LabelEncoder
+CLASS_NAMES = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J']  # line = 0..9, like the LabelEncoder
 
 
 def load_embeddings(split_name):
@@ -20,14 +20,14 @@ def load_embeddings(split_name):
 
 
 if __name__ == '__main__':
-    # ---- Φόρτωση των embeddings (ΟΧΙ raw δεδομένων -- ήδη συμπυκνωμένα από τα 3 ConvTran) ----
+    # ---- loed embeddings (NOT raw data) ----
     X_train, y_train = load_embeddings('meta_train')
     X_test, y_test = load_embeddings('test')
     print(f'meta_train: X={X_train.shape}, y={y_train.shape}')
     print(f'test:       X={X_test.shape}, y={y_test.shape}')
 
-    # ---- Εκπαίδευση του meta-classifier ----
-    # class_weight='balanced' αντισταθμίζει τις μικρές διαφορές στο μέγεθος ανά κλάση
+    # ---- Train the meta-classifier ----
+    # class_weight='balanced' 
     meta_clf = RandomForestClassifier(
         n_estimators=200,
         random_state=42,
@@ -35,7 +35,7 @@ if __name__ == '__main__':
     )
     meta_clf.fit(X_train, y_train)
 
-    # ---- Πρόβλεψη & αξιολόγηση στο ΑΓΝΩΣΤΟ test set ----
+    # ---- Prediction & Validation at the UNKNOWN test set ----
     y_pred = meta_clf.predict(X_test)
 
     acc = accuracy_score(y_test, y_pred)
@@ -56,6 +56,6 @@ if __name__ == '__main__':
     plt.savefig(os.path.join(OUTPUT_PLOTS_DIR, 'ensemble_confusion_matrix.png'), dpi=150)
     print(f'\nΑποθηκεύτηκε: {OUTPUT_PLOTS_DIR}/ensemble_confusion_matrix.png')
 
-    # ---- Αποθήκευση του εκπαιδευμένου meta-classifier ----
+    # ---- Save the trained meta-classifier ----
     joblib.dump(meta_clf, os.path.join(OUTPUT_MODELS_DIR, 'meta_classifier.joblib'))
     print(f'Αποθηκεύτηκε: {OUTPUT_MODELS_DIR}/meta_classifier.joblib')

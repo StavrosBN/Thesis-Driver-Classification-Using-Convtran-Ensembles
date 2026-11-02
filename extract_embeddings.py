@@ -31,7 +31,7 @@ def load_model(checkpoint_path):
         dropout=ckpt['dropout'],
     ).to(DEVICE)
     model.load_state_dict(ckpt['model_state_dict'])
-    model.eval()  # ΚΡΙΣΙΜΟ: απενεργοποιεί dropout/batchnorm updates, καθαρό inference
+    model.eval()  # CRITICAL: disables dropout/batchnorm updates, clean inference
     return model
 
 
@@ -40,11 +40,11 @@ def extract_combined_embeddings(models, X):
     X: (N, 60, 30) -- ίδιο σχήμα με τα windows.
     Επιστρέφει (N, 3*emb_size) -- τα embeddings των 3 μοντέλων ενωμένα.
     """
-    X = X.astype(np.float32).transpose(0, 2, 1)  # (N, 30, 60), όπως θέλει το ConvTran
+    X = X.astype(np.float32).transpose(0, 2, 1)  # (N, 30, 60)
     X_tensor = torch.from_numpy(X).to(DEVICE)
 
     embeddings_per_model = []
-    with torch.no_grad():  # καμία εκπαίδευση, μόνο forward pass
+    with torch.no_grad():  # no training, only forward pass
         for model in models:
             emb = model(X_tensor, return_embedding=True)  # (N, emb_size)
             embeddings_per_model.append(emb.cpu().numpy())
@@ -56,13 +56,13 @@ def extract_combined_embeddings(models, X):
 if __name__ == '__main__':
     print(f'Χρήση συσκευής: {DEVICE}')
 
-    # ---- Φόρτωση των 3 ήδη εκπαιδευμένων μοντέλων ----
+    # ---- Load the 3 trained models ----
     models = []
     for name, path in CHECKPOINTS.items():
         print(f'Φόρτωση {name} από {path}')
         models.append(load_model(path))
 
-    # ---- Εξαγωγή embeddings για meta_train και test ----
+    # ---- Export embeddings for meta_train and test ----
     for split_name in ['meta_train', 'test']:
         data = np.load(os.path.join(FULL_DATA_DIR, f'{split_name}.npz'))
         X, y = data['X'], data['y']

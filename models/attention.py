@@ -1,6 +1,6 @@
 """
-Προσαρμοσμένο από το επίσημο repo του ConvTran.
-Υλοποιεί το eRPE (efficient Relative Position Encoding), Ενότητα 4.2 του paper.
+Modified from the original repository 
+https://github.com/Navidfoumani/ConvTran
 """
 import torch
 import torch.nn as nn
@@ -9,12 +9,10 @@ from einops import rearrange
 
 class Attention_Rel_Scl(nn.Module):
     """
-    Multi-head self-attention με eRPE: αντί για το κλασικό positional encoding
-    πριν το attention, εδώ προστίθεται ένα learnable scalar bias (relative_bias)
-    ΜΕΤΑ το softmax, βασισμένο μόνο στη σχετική απόσταση (i-j) μεταξύ δύο θέσεων
-    -- ένα scalar ανά σχετική απόσταση, όχι ολόκληρο vector, γι' αυτό είναι
-    πολύ πιο "ελαφρύ" σε αριθμό παραμέτρων από τα προηγούμενα relative encodings
-    (Πίνακας 1 του paper).
+    Multi-head self-attention with eRPE: instead of the usual positional encoding
+    bedore the attention, we add a learnable scala bias (relative_bias)
+    AFTER softmax, based only on the relative distance (i-j) between 2 positions
+    -- a scalar per relative distance, not a whole vector.
     """
 
     def __init__(self, emb_size, num_heads, seq_len, dropout):
@@ -27,7 +25,7 @@ class Attention_Rel_Scl(nn.Module):
         self.value = nn.Linear(emb_size, emb_size, bias=False)
         self.query = nn.Linear(emb_size, emb_size, bias=False)
 
-        # Ένα learnable βάρος για κάθε δυνατή σχετική απόσταση (2*seq_len - 1 συνολικά)
+        # A learnable weight per relative distance (2*seq_len - 1 overall)
         self.relative_bias_table = nn.Parameter(torch.zeros((2 * self.seq_len - 1), num_heads))
         coords = torch.meshgrid((torch.arange(1), torch.arange(self.seq_len)))
         coords = torch.flatten(torch.stack(coords), 1)
@@ -47,11 +45,11 @@ class Attention_Rel_Scl(nn.Module):
         q = self.query(x).reshape(batch_size, seq_len, self.num_heads, -1).transpose(1, 2)
 
         attn = torch.matmul(q, k) * self.scale
-        attn = nn.functional.softmax(attn, dim=-1)  # softmax ΠΡΙΝ το relative bias
+        attn = nn.functional.softmax(attn, dim=-1)  # softmax BEFORE the relative bias
 
         relative_bias = self.relative_bias_table.gather(0, self.relative_index.repeat(1, self.num_heads))
         relative_bias = rearrange(relative_bias, '(h w) c -> 1 c h w', h=seq_len, w=seq_len)
-        attn = attn + relative_bias  # το eRPE προστίθεται ΜΕΤΑ το softmax
+        attn = attn + relative_bias  #  eRPE added AFTER softmax
 
         out = torch.matmul(attn, v)
         out = out.transpose(1, 2).reshape(batch_size, seq_len, -1)

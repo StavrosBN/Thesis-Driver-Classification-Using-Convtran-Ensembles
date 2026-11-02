@@ -1,7 +1,7 @@
 """
-Προσαρμοσμένο από το επίσημο repo του ConvTran (Foumani et al., 2023):
+Customized from the original repository for ConvTran (Foumani et al., 2023).
 https://github.com/Navidfoumani/ConvTran
-Υλοποιεί το tAPE (time Absolute Position Encoding), Ενότητα 4.1 του paper.
+tAPE (time Absolute Position Encoding)
 """
 import math
 import torch
@@ -10,11 +10,11 @@ import torch.nn as nn
 
 class tAPE(nn.Module):
     """
-    Η βασική διαφορά από το κλασικό sinusoidal position encoding (Vaswani et al.)
-    είναι ο όρος (d_model / max_len) στην Εξ. 13 του paper -- ενσωματώνει το μήκος
-    της σειράς (max_len) στη συχνότητα, ώστε το encoding να δουλεύει σωστά ακόμα
-    και σε χαμηλές διαστάσεις embedding (κάτι συνηθισμένο σε time series, σε
-    αντίθεση με NLP όπου d_model είναι συνήθως 512+).
+    The key difference from the classic sinusoidal position encoding (Vaswani et al.)
+    is the term (d_model / max_len) it incorporates the
+    sequence length (max_len) into the frequency, ensuring the encoding works
+    correctly even with low embedding dimensions (which is common in time series,
+    unlike in NLP, where d_model is typically 512+)
     """
 
     def __init__(self, d_model, dropout=0.1, max_len=1024, scale_factor=1.0):

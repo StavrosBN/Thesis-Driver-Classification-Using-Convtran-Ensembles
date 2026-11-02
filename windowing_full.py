@@ -21,8 +21,7 @@ def process_dataset(csv_path, out_dir, L=60, stride=15):
     feature_cols = [c for c in df.columns if c not in NON_FEATURE_COLS]
     os.makedirs(out_dir, exist_ok=True)
 
-    # Εδώ μας ενδιαφέρουν πραγματικά μόνο τα meta_train/test.
-    # Κρατάμε και τα convtran_train/val μόνο για δομική συνέπεια με τα per-group datasets.
+
     for split_name in ['convtran_train', 'convtran_val', 'meta_train', 'test']:
         split_df = df[df['split'] == split_name]
         X_list, y_list = [], []

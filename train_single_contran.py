@@ -27,7 +27,7 @@ NUM_HEADS = 8
 DIM_FF = 256
 DROPOUT = 0.2
 
-NUM_CLASSES = 10  # A-J μαζί, σε αντίθεση με τα 3 επιμέρους ConvTran
+NUM_CLASSES = 10  # A-J together
 DATA_DIR = 'data/windows/full'
 OUTPUT_DIR = 'outputs/models'
 os.makedirs(OUTPUT_DIR, exist_ok=True)

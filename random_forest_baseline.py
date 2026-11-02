@@ -21,11 +21,11 @@ def load_windows(split_name):
 
 def summarize_windows(X):
     """
-    Μετατρέπει κάθε παράθυρο (60 timesteps x 30 features) σε ένα tabular
-    διάνυσμα χαρακτηριστικών, υπολογίζοντας μέσο όρο και τυπική απόκλιση
-    ανά feature μέσα στο παράθυρο -- έτσι το Random Forest βλέπει ακριβώς
-    το ίδιο 'χρονικό απόσπασμα' με το ConvTran, απλά συμπυκνωμένο με απλά
-    στατιστικά αντί για μαθημένα embeddings.
+    It converts each window (60 timesteps x 30 features) into a tabular feature 
+    vector by calculating the mean and standard deviation for each feature within 
+    that window—this way, the Random Forest sees the exact same 'temporal segment'
+    as the ConvTran, only condensed using simple statistics instead 
+    of learned embeddings.
     """
     mean_features = X.mean(axis=1)  # (N, 30)
     std_features = X.std(axis=1)    # (N, 30)
@@ -33,7 +33,7 @@ def summarize_windows(X):
 
 
 if __name__ == '__main__':
-    # ---- Φόρτωση ΤΩΝ ΙΔΙΩΝ windows με το ensemble, όχι νέο split ----
+    # ---- Load THE SAME windows with the ensemble, not a new split ----
     X_train_raw, y_train = load_windows('meta_train')
     X_test_raw, y_test = load_windows('test')
 
@@ -42,7 +42,7 @@ if __name__ == '__main__':
     print(f'meta_train (summarized): X={X_train.shape}, y={y_train.shape}')
     print(f'test (summarized):       X={X_test.shape}, y={y_test.shape}')
 
-    # ---- Ίδιος τύπος/παράμετροι Random Forest με τον meta-classifier ----
+    # ---- Same type/parameters Random Forest woth the meta-classifier ----
     rf_baseline = RandomForestClassifier(
         n_estimators=200,
         random_state=42,

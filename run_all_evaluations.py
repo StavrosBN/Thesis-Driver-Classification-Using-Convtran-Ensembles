@@ -45,9 +45,9 @@ def print_section(title):
 
 
 if __name__ == '__main__':
-    results = {}  # για τον τελικό συγκεντρωτικό πίνακα
+    results = {}  
 
-    # ---- 1. Τα 3 επιμέρους ConvTran, στο δικό τους πραγματικό test set ----
+    # ---- 1. The 3 ConvTran, on their own test set ----
     print_section('1. ΕΠΙΜΕΡΟΥΣ ConvTran (test set ανά ομάδα)')
     for group in ['cleaned_1', 'cleaned_2', 'cleaned_3']:
         model = load_convtran(f'outputs/models/convtran_{group}.pt')
@@ -58,7 +58,7 @@ if __name__ == '__main__':
         print(f'\n{group}: test accuracy = {acc:.4f}')
         print(classification_report(data['y'], y_pred, target_names=GROUP_CLASS_NAMES[group], zero_division=0))
 
-    # ---- 2. Single ConvTran, απευθείας στο πλήρες πρόβλημα (χωρίς ensemble) ----
+    # ---- 2. Single ConvTran, on the whole problem (without ensemble) ----
     print_section('2. SINGLE ConvTran (χωρίς ensemble, 10 κλάσεις)')
     model = load_convtran('outputs/models/convtran_single_full.pt')
     data = np.load('data/windows/full/test.npz')
@@ -78,7 +78,7 @@ if __name__ == '__main__':
     print(f'\nTest accuracy = {acc:.4f}')
     print(classification_report(emb_data['y'], y_pred, target_names=ALL_CLASS_NAMES, zero_division=0))
 
-    # ---- 4. Random Forest baseline (raw στατιστικά, χωρίς κανένα ConvTran) ----
+    # ---- 4. Random Forest baseline (raw statistics, none ConvTran) ----
     print_section('4. RANDOM FOREST BASELINE (χωρίς ConvTran)')
     rf_baseline = joblib.load('outputs/models/rf_baseline.joblib')
     raw_data = np.load('data/windows/full/test.npz')
@@ -89,7 +89,7 @@ if __name__ == '__main__':
     print(f'\nTest accuracy = {acc:.4f}')
     print(classification_report(raw_data['y'], y_pred, target_names=ALL_CLASS_NAMES, zero_division=0))
 
-    # ---- Συγκεντρωτικός πίνακας ----
+
     print_section('ΣΥΓΚΕΝΤΡΩΤΙΚΟΣ ΠΙΝΑΚΑΣ')
     for name, acc in results.items():
         print(f'{name:35s} : {acc:.4f} ({acc*100:.2f}%)')

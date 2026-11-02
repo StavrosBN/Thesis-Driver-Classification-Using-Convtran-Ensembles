@@ -1,15 +1,13 @@
 """
-plot_training_curves.py
+This generates Figure 5.1 of the thesis: training/validation loss curves
+from the OFFICIAL, stabilized (seed=42) training run of ConvTran
+(the 'cleaned_1' group) — the very same run from which all the final
+results in the work are derived (Table 5.4, Chapter 7).
 
-Δημιουργεί το Σχήμα 5.1 της διπλωματικής: καμπύλες training/validation loss
-από το ΕΠΙΣΗΜΟ, σταθεροποιημένο (seed=42) training run του ConvTran
-(ομάδα cleaned_1) — το ίδιο run από το οποίο προέρχονται όλα τα τελικά
-αποτελέσματα της εργασίας (Πίνακας 5.4, Κεφάλαιο 7).
-
-Το καλύτερο epoch (βάσει early stopping, ελάχιστο validation loss) είναι
-το 22 — ταυτίζεται με το epoch που αναφέρεται στον Πίνακα 5.4 και με το
-πεδίο 'epoch' του αποθηκευμένου checkpoint (outputs/models/convtran_cleaned_1.pt),
-όπως επιβεβαιώθηκε μέσω του check_checkpoints.py.
+The best epoch (determined by early stopping—i.e., the point of minimum validation loss)
+is epoch 22; this corresponds to the epoch cited in Table 5.4 and to the
+'epoch' field within the saved checkpoint file (outputs/models/convtran_cleaned_1.pt),
+as verified using the `check_checkpoints.py` script.
 """
 
 import matplotlib.pyplot as plt

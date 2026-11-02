@@ -5,12 +5,12 @@ import seaborn as sns
 from sklearn.feature_selection import mutual_info_classif
 from sklearn.preprocessing import LabelEncoder
 
-# 1. Φόρτωση Δεδομένων
+# 1. Load Data
 print("=== Loading Data ===")
 df = pd.read_csv("data/cleaned_data.csv")
 print(f"Dataset Shape: {df.shape}")
 
-# 2. Έλεγχος για NaN (Ελλιπείς Τιμές)
+# 2. Chack NaN 
 print("\n=== Checking for NaN Values ===")
 nan_values = df.isnull().sum()
 if nan_values.sum() == 0:
@@ -18,25 +18,23 @@ if nan_values.sum() == 0:
 else:
     print(nan_values[nan_values > 0])
 
-# 3. Έλεγχος για Outliers (Ακραίες Τιμές)
-# Χρησιμοποιούμε boxplots για να δούμε αν υπάρχουν τιμές εκτός ορίων
+# 3. Check Outliers 
+# Use boxplots 
 plt.figure(figsize=(15, 8))
-# Επιλέγουμε μερικά βασικά χαρακτηριστικά για το γράφημα (για να μην γεμίσει η οθόνη)
 cols_to_plot = df.drop(columns=["Class", "PathOrder"]).columns[:10] 
 df[cols_to_plot].boxplot()
 plt.title("Boxplot for Outlier Detection (First 10 features)")
 plt.xticks(rotation=45)
 plt.show()
 
-# 4. Κατανομή Κλάσεων (Class Balance)
+# 4. Class Balance
 print("\n=== Class Distribution ===")
-print(df["Class"].value_counts(normalize=True)) # Ποσοστά ανά οδηγό
+print(df["Class"].value_counts(normalize=True)) # Presentage for each driver
 sns.countplot(x='Class', data=df)
 plt.title("Distribution of Driver Classes")
 plt.show()
 
-# 5. Correlation Analysis (Συσχέτιση)
-# Βλέπουμε ποια κανάλια "κινούνται" μαζί
+# 5. Correlation Analysis 
 print("\n=== Computing Correlation Matrix ===")
 plt.figure(figsize=(12, 10))
 features_only = df.drop(columns=["Class", "PathOrder"])
@@ -45,24 +43,23 @@ sns.heatmap(corr_matrix, annot=False, cmap='coolwarm')
 plt.title("Feature Correlation Heatmap")
 plt.show()
 
-# 6. Feature Selection με Mutual Information
-# Αυτό απαντάει άμεσα στην ερώτηση του καθηγητή: "Με βάση ποια μέθοδο;"
+# 6. Feature Selection with Mutual Information
 print("\n=== Calculating Mutual Information Score ===")
 X = features_only
 y = df["Class"]
 
-# Κωδικοποίηση του target για το Mutual Info
+# Encoding the target for Mutual Info
 le = LabelEncoder()
 y_encoded = le.fit_transform(y)
 
-# Υπολογισμός MI
+# Calculate MI
 mi_scores = mutual_info_classif(X, y_encoded, random_state=42)
 mi_results = pd.Series(mi_scores, index=X.columns).sort_values(ascending=False)
 
 print("\nTop 10 Σημαντικότερα Κανάλια (βάσει Mutual Information):")
 print(mi_results.head(10))
 
-# Γράφημα Σημαντικότητας
+# Graphs
 plt.figure(figsize=(10, 6))
 mi_results.head(15).plot(kind='barh')
 plt.title("Top 15 Features by Mutual Information")

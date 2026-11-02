@@ -41,7 +41,7 @@ if __name__ == '__main__':
     X_tensor = torch.from_numpy(X).to(DEVICE)
 
     with torch.no_grad():
-        logits = model(X_tensor)  # ΚΑΝΟΝΙΚΗ πρόβλεψη τώρα, όχι embedding
+        logits = model(X_tensor)  # PREDICTION NOW, not embedding
         y_pred = logits.argmax(dim=1).cpu().numpy()
 
     acc = accuracy_score(y_test, y_pred)
